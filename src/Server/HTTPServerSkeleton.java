@@ -16,7 +16,6 @@ class RequestHandler extends Thread {
 
     private static final String UPLOAD_DIR = "src/Server/uploaded/" ;
 
-    private static final int CHUNK_SIZE = 1024 ;
 
 
     RequestHandler(Socket s) {
@@ -28,30 +27,40 @@ class RequestHandler extends Thread {
         return in.readLine();
     }
 
+    public String createHeader(long contentLength, String status, String mimeType) {
+        return "HTTP/1.1 " + status + "\r\n" +
+                "Server: Java HTTP Server: 1.0\r\n" +
+                "Date: " + new Date() + "\r\n" +
+                "Content-Type: " + mimeType + "\r\n" +
+                "Content-Length: " + contentLength + "\r\n" ;
+    }
+
     public void sendResponse(String content, String status, String mimeType) throws IOException {
+
         PrintWriter pr = new PrintWriter(s.getOutputStream());
 
-        pr.write("HTTP/1.1 " + status +"\r\n");
-        pr.write("Server: Java HTTP Server: 1.0\r\n");
-        pr.write("Date: " + new Date() + "\r\n");
-        pr.write("Content-Type: " + mimeType + "\r\n");
-        pr.write("Content-Length: " + content.length() + "\r\n");
-        pr.write("\r\n");
+        String header = createHeader(content.length(), status, mimeType);
+
+        pr.write(header+"\r\n");
         pr.write(content);
         pr.flush();
     }
 
+
     public String getMimeType(File file) throws IOException {
+
         String mimeType = Files.probeContentType(Path.of(file.getPath()));
+
         if (mimeType == null) {
-            // Default to binary if MIME type cannot be determined
             mimeType = "application/octet-stream";
+            //for binary data
         }
         return mimeType;
     }
 
     public void logRequestAndResponse(String request, int status, String mimeType) {
-        try (FileWriter fw = new FileWriter("server.log", true);
+
+        try (FileWriter fw = new FileWriter("server.log");
              BufferedWriter bw = new BufferedWriter(fw);
              PrintWriter logWriter = new PrintWriter(bw)) {
 
@@ -69,6 +78,7 @@ class RequestHandler extends Thread {
     }
 
     public String generateDirectoryListing(File directory) {
+
         StringBuilder content = new StringBuilder("<html><body>");
         String path = directory.getPath().replace("src\\Server\\","");
 
@@ -76,10 +86,12 @@ class RequestHandler extends Thread {
         content.append("<ul>");
 
         File[] files = directory.listFiles();
+
         if (files != null) {
             for (File file : files) {
 
-                System.out.println("name of the file "+file.getName());
+//                System.out.println("name of the file "+file.getName());
+
                 if (file.isDirectory()) {
                     content.append("<li><b><i><a href=\"").append(file.getName())
                             .append("/\">").append(file.getName()).append("/</a></i></b></li>");
@@ -92,52 +104,61 @@ class RequestHandler extends Thread {
         }
 
         content.append("</ul></body></html>");
+
         return content.toString();
     }
 
 
     public void serveFile(File file, String input) throws IOException {
+
         String mimeType = getMimeType(file);
 
         if (mimeType.startsWith("text")) {
-            // Serve text files in a new HTML page
+
             String content = new String(HTTPServerSkeleton.readFileData(file, (int) file.length()), "UTF-8");
+
             String htmlContent = "<html><body><pre>" + content + "</pre></body></html>";
+
             sendResponse(htmlContent, "200 OK", "text/html");
+
             logRequestAndResponse(input, 200, "text/html");
+
         } else if (mimeType.startsWith("image")) {
-            // Serve image files directly
+
             byte[] fileData = HTTPServerSkeleton.readFileData(file, (int) file.length());
+
             sendBinaryResponse(fileData, "200 OK", mimeType);
+
             logRequestAndResponse(input, 200, mimeType);
+
         } else {
-            // Force download for other formats
+
             sendFileAsDownload(file, input);
         }
     }
 
 
 
-
-
     public void sendFileAsDownload(File file, String input) throws IOException {
-        byte[] buffer = new byte[1024]; // Set your chunk size (e.g., 1KB)
+
+        byte[] buffer = new byte[1024];
         int bytesRead;
 
-        // Send headers
         PrintWriter pr = new PrintWriter(s.getOutputStream());
-        pr.write("HTTP/1.1 200 OK\r\n");
-        pr.write("Server: Java HTTP Server: 1.0\r\n");
-        pr.write("Date: " + new Date() + "\r\n");
-        pr.write("Content-Type: application/octet-stream\r\n");
-        pr.write("Content-Length: " + file.length() + "\r\n");
+
+        String header = createHeader(file.length(),"200","application/octet-stream");
+
+        pr.write(header);
+
         pr.write("Content-Disposition: attachment; filename=\"" + file.getName() + "\"\r\n");
+
         pr.write("\r\n");
         pr.flush();
 
-        // Send file in chunks
+        // file in chunks
         BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
         OutputStream os = s.getOutputStream();
+
         while ((bytesRead = bis.read(buffer)) != -1) {
             os.write(buffer, 0, bytesRead);
             os.flush();
@@ -151,19 +172,16 @@ class RequestHandler extends Thread {
 
 
     public void sendBinaryResponse(byte[] fileData, String status, String mimeType) throws IOException {
+
         OutputStream out = s.getOutputStream();
 
-        // Write HTTP headers
         PrintWriter pr = new PrintWriter(out);
-        pr.write("HTTP/1.1 " + status + "\r\n");
-        pr.write("Server: Java HTTP Server: 1.0\r\n");
-        pr.write("Date: " + new Date() + "\r\n");
-        pr.write("Content-Type: " + mimeType + "\r\n");
-        pr.write("Content-Length: " + fileData.length + "\r\n");
+
+        pr.write(createHeader(fileData.length,status,mimeType));
+
         pr.write("\r\n");
         pr.flush();
 
-        // Write binary data (image content)
         out.write(fileData);
         out.flush();
     }
@@ -171,9 +189,9 @@ class RequestHandler extends Thread {
 
     private void handleFileUpload(String request, InputStream is, OutputStream os) {
         try {
-            // Parse the file name and file size from the client request
+
             String[] requestParts = request.split(" ");
-            System.out.println(Arrays.toString(requestParts));
+//            System.out.println(Arrays.toString(requestParts));
 
             if (requestParts.length < 3) {
                 String errorMessage = "Invalid upload request.";
@@ -204,51 +222,65 @@ class RequestHandler extends Thread {
                 }
             }
 
-            // Construct full file path
-            File outFile = new File(uploadDir, fileName);  // Combines directory and file name safely
+
+            File outFile = new File(uploadDir, fileName);
 
             try (BufferedOutputStream fileOut = new BufferedOutputStream(new FileOutputStream(outFile))) {
-                // Read file chunks from the client and write them to the file
-                byte[] buffer = new byte[65536];  // Use byte[] for reading/writing binary data
+
+                byte[] buffer = new byte[65536];
+
                 int bytesRead;
+
                 long totalBytesReceived = 0;
 
                 while (totalBytesReceived < fileSize && (bytesRead = is.read(buffer)) != -1) {
-                    // Write the exact number of bytes read to the file
+
                     fileOut.write(buffer, 0, bytesRead);
+
                     totalBytesReceived += bytesRead;
                 }
 
                 if (totalBytesReceived == fileSize) {
+
                     String successMessage = "File " + fileName + " uploaded successfully.";
+
                     System.out.println(successMessage);
+
                     os.write(("SUCCESS " + successMessage + "\n").getBytes());
+
                 } else {
                     String errorMessage = "File upload incomplete for: " + fileName;
+
                     System.err.println(errorMessage);
+
                     os.write(("ERROR " + errorMessage + "\n").getBytes());
                 }
             } catch (IOException e) {
+
                 String errorMessage = "Error writing file: " + e.getMessage();
+
                 System.err.println(errorMessage);
+
                 try {
                     os.write(("ERROR " + errorMessage + "\n").getBytes());
                 } catch (IOException ex) {
                     System.err.println("Error sending response: " + ex.getMessage());
                 }
+
             }
         } catch (NumberFormatException | IOException e) {
+
             String errorMessage = "Error handling file upload: " + e.getMessage();
             System.err.println(errorMessage);
+
             try {
                 os.write(("ERROR " + errorMessage + "\n").getBytes());
             } catch (IOException ex) {
                 System.err.println("Error sending response: " + ex.getMessage());
             }
+
         }
     }
-
-
 
 
     private boolean isValidFileType(String fileName) {
@@ -263,9 +295,12 @@ class RequestHandler extends Thread {
 
 
     public void run() {
+
         String input;
+
         try {
             input = readRequest();
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -273,41 +308,52 @@ class RequestHandler extends Thread {
         System.out.println("input: " + input);
 
         if (input != null && input.length() > 0) {
+
             String[] parts = input.split(" ");
+
             if (parts[0].equals("GET")) {
-                // Extract the requested path
+
                 String requestedPath = parts[1].equals("/") ? root : root + parts[1];
 
                 File file = new File(requestedPath);
 
                 if (file.exists()) {
+
                     if (file.isDirectory()) {
+
                         try {
+
                             String content = generateDirectoryListing(file);
-                            sendResponse(content, "200 OK", "text/html"); // Send directory listing as HTML
-                            logRequestAndResponse(input, 200, "text/html"); // Log the directory request
+
+//                            System.out.println(content);
+
+                            sendResponse(content, "200 OK", "text/html");
+
+                            logRequestAndResponse(input, 200, "text/html");
+
                         } catch (IOException e) {
+
                             throw new RuntimeException(e);
                         }
                     } else {
-                        // Serve the file
+                        // for Serving the file
                         try {
-                            serveFile(file, input); // A method to serve files based on their type
+                            serveFile(file, input);
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
                     }
                 } else {
                     try {
-                        sendResponse("<html><h2>404 Not Found</h2></html>", "404 Not Found", "text/html"); // Send a 404 response
-                        logRequestAndResponse(input, 404, "text/html"); // Log the 404 response
+                        sendResponse("<html><h2>404 Not Found</h2></html>", "404 Not Found", "text/html");
+                        logRequestAndResponse(input, 404, "text/html");
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
                 }
             } else if (parts[0].equals("UPLOAD")) {
 
-                System.out.println("received upload request");
+//                System.out.println("received upload request");
 
                 try {
                     handleFileUpload(input,s.getInputStream(),s.getOutputStream());
@@ -339,6 +385,7 @@ class RequestHandler extends Thread {
     static final int PORT = 6789;
 
         public static byte[] readFileData(File file, int fileLength) throws IOException {
+
             FileInputStream fileIn = null;
             byte[] fileData = new byte[fileLength];
 
@@ -350,7 +397,7 @@ class RequestHandler extends Thread {
                     fileIn.close();
             }
 
-            return fileData;  // Return the byte data for the file
+            return fileData;
         }
 
 
