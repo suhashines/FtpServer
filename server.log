@@ -1,0 +1,388 @@
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1 HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /favicon.ico HTTP/1.1
+RESPONSE: HTTP/1.1 404 NOT FOUND
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir2/ HTTP/1.1
+RESPONSE: HTTP/1.1 404 NOT FOUND
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /file2.txt HTTP/1.1
+RESPONSE: HTTP/1.1 404 NOT FOUND
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /file1.txt HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/plain
+----------------------------------------------------
+REQUEST: GET /file2.txt HTTP/1.1
+RESPONSE: HTTP/1.1 404 NOT FOUND
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /file1.txt HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/plain
+----------------------------------------------------
+REQUEST: GET /doc1.docx HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: application/octet-stream
+----------------------------------------------------
+REQUEST: GET /dir1/ HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/dir2/ HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/dir2/dir3/ HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/dir2/dir3/file3.txt HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/plain
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/ HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/dir2/ HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/dir2/dir3/ HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /file1.txt HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/plain
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /file1.txt HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/plain
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/ HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/dir2/ HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/dir2/dir3/ HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /photo_2023-11-06_13-44-04.jpg HTTP/1.1
+RESPONSE: HTTP/1.1 404 NOT FOUND
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /photo_2023-11-06_13-44-04.jpg HTTP/1.1
+RESPONSE: HTTP/1.1 404 NOT FOUND
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/ HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/dir2/ HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/dir2/dir3/ HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/dir2/dir3/file3.txt HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/dir2/send.txt HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/ HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/dir2/ HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/dir2/dir3/ HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /file1.txt HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/ HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/dir2/ HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/dir2/dir3/ HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/dir2/dir3/file3.txt HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /favicon.ico HTTP/1.1
+RESPONSE: HTTP/1.1 404 NOT FOUND
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/ HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/ HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /favicon.ico HTTP/1.1
+RESPONSE: HTTP/1.1 404 NOT FOUND
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /photo_2023-11-06_13-44-04.jpg HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: image/jpeg
+----------------------------------------------------
+REQUEST: GET /Shell_Commands.pdf HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: application/octet-stream
+----------------------------------------------------
+REQUEST: GET /dir1/ HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/010-a.png HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: image/png
+----------------------------------------------------
+REQUEST: GET /dir1/file2.txt HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/dir2/ HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/dir2/dir3/ HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/ HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/file2.txt HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/dir2/ HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/dir2/send.txt HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/dir2/dir3/ HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/dir2/dir3/file3.txt HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/ HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/ HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: UPLOAD file1.txt 10
+RESPONSE: HTTP/1.1 501 NOT FOUND
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: UPLOAD file1.txt 10
+RESPONSE: HTTP/1.1 501 NOT FOUND
+Content-Type: text/html
+----------------------------------------------------
