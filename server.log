@@ -1,4 +1,0 @@
-REQUEST: GET /dir1/dir2/dir3/ HTTP/1.1
-RESPONSE: HTTP/1.1 200 OK
-Content-Type: text/html
-----------------------------------------------------

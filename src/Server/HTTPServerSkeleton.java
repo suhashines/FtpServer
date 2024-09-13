@@ -17,14 +17,28 @@ class RequestHandler extends Thread {
     private static final String UPLOAD_DIR = "src/Server/uploaded/" ;
 
 
-
     RequestHandler(Socket s) {
         this.s = s;
     }
 
-    public String readRequest() throws IOException {
-        BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
-        return in.readLine();
+
+    public String readLineFromInputStream(){
+        try {
+            InputStream inputStream = s.getInputStream();
+            int tmp;
+            StringBuilder response = new StringBuilder();
+            while((tmp = inputStream.read()) != -1){
+                char c = (char) tmp;
+                if(c == '\n') break;
+                response.append(c);
+            }
+            if( response.length()!=0 && response.charAt(response.length() - 1) == '\r'){
+                response.deleteCharAt(response.length() - 1);
+            }
+            return response.toString();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public String createHeader(long contentLength, String status, String mimeType) {
@@ -47,29 +61,31 @@ class RequestHandler extends Thread {
     }
 
 
-    public String getMimeType(File file) throws IOException {
 
-        String mimeType = Files.probeContentType(Path.of(file.getPath()));
-
-        if (mimeType == null) {
-            mimeType = "application/octet-stream";
-            //for binary data
-        }
-        return mimeType;
-    }
 
     public void logRequestAndResponse(String request, int status, String mimeType) {
 
-        try (FileWriter fw = new FileWriter("server.log");
+        try (FileWriter fw = new FileWriter("log.txt",true);
+
              BufferedWriter bw = new BufferedWriter(fw);
+
              PrintWriter logWriter = new PrintWriter(bw)) {
 
             // Log request
             logWriter.println("REQUEST: " + request);
 
+            String[] parts = request.split(" ");
+
+            if(parts[0].equals("GET")){
+                logWriter.println("RESPONSE: HTTP/1.1 " + status + " " + (status == 200 ? "OK" : "NOT FOUND"));
+                logWriter.println("Content-Type: " + mimeType);
+            }else{
+                logWriter.println("RESPONSE: HTTP/1.1 " + status);
+                logWriter.println("MESSAGE: " + mimeType);
+            }
+
             // Log response
-            logWriter.println("RESPONSE: HTTP/1.1 " + status + " " + (status == 200 ? "OK" : "NOT FOUND"));
-            logWriter.println("Content-Type: " + mimeType);
+
             logWriter.println("----------------------------------------------------");
 
         } catch (IOException e) {
@@ -77,10 +93,20 @@ class RequestHandler extends Thread {
         }
     }
 
-    public String generateDirectoryListing(File directory) {
+    public String getMimeType(File file) throws IOException {
+
+        String mimeType = Files.probeContentType(Path.of(file.getPath()));
+
+        if (mimeType == null) {
+            mimeType = "application/octet-stream"; // for binary data
+        }
+        return mimeType;
+    }
+
+    public String generateDirectoryListing(File directory) throws IOException {
 
         StringBuilder content = new StringBuilder("<html><body>");
-        String path = directory.getPath().replace("src\\Server\\","");
+        String path = directory.getPath().replace("src\\Server\\", "");
 
         content.append("<h2>Index of ").append(path).append("</h2>");
         content.append("<ul>");
@@ -90,15 +116,22 @@ class RequestHandler extends Thread {
         if (files != null) {
             for (File file : files) {
 
-//                System.out.println("name of the file "+file.getName());
-
                 if (file.isDirectory()) {
                     content.append("<li><b><i><a href=\"").append(file.getName())
                             .append("/\">").append(file.getName()).append("/</a></i></b></li>");
                 } else {
-                    content.append("<li><a href=\"").append(file.getName())
-                            .append("\">").append(file.getName()).append("</a></li>");
+                    String mimeType = getMimeType(file);
 
+                    // Check if the file is text or an image file
+                    if (mimeType.startsWith("text") || mimeType.startsWith("image")) {
+                        // Open text or image files in a new tab
+                        content.append("<li><a href=\"").append(file.getName())
+                                .append("\" target=\"_blank\">").append(file.getName()).append("</a></li>");
+                    } else {
+                        // Other files will open in the same tab
+                        content.append("<li><a href=\"").append(file.getName())
+                                .append("\">").append(file.getName()).append("</a></li>");
+                    }
                 }
             }
         }
@@ -107,6 +140,7 @@ class RequestHandler extends Thread {
 
         return content.toString();
     }
+
 
 
     public void serveFile(File file, String input) throws IOException {
@@ -189,107 +223,108 @@ class RequestHandler extends Thread {
 
     private void handleFileUpload(String request, InputStream is, OutputStream os) {
         try {
-
             String[] requestParts = request.split(" ");
-//            System.out.println(Arrays.toString(requestParts));
+            System.out.println(Arrays.toString(requestParts));
 
             if (requestParts.length < 3) {
+
                 String errorMessage = "Invalid upload request.";
+
                 System.err.println(errorMessage);
-                os.write(("ERROR " + errorMessage + "\n").getBytes());
+
+                os.write(("ERROR " + errorMessage + "\r\n").getBytes());
+
+                logRequestAndResponse(request,409,errorMessage);
+
                 return;
             }
 
             String fileName = requestParts[1];
             long fileSize = Long.parseLong(requestParts[2]);
 
-            // Validate file type
+            System.out.println("File size: " + fileSize);
+
             if (!isValidFileType(fileName)) {
                 String errorMessage = "Invalid file type: " + fileName;
                 System.err.println(errorMessage);
-                os.write(("ERROR " + errorMessage + "\n").getBytes());
+                os.write(("ERROR " + errorMessage + "\r\n").getBytes());
+                logRequestAndResponse(request,409,errorMessage);
                 return;
             }
 
-            // Ensure upload directory exists
             File uploadDir = new File(UPLOAD_DIR);
-            if (!uploadDir.exists()) {
-                if (!uploadDir.mkdir()) { // Check if directory creation is successful
-                    String errorMessage = "Failed to create upload directory.";
-                    System.err.println(errorMessage);
-                    os.write(("ERROR " + errorMessage + "\n").getBytes());
-                    return;
-                }
-            }
 
+            if (!uploadDir.exists() && !uploadDir.mkdir()) {
+                String errorMessage = "Failed to create upload directory.";
+                System.err.println(errorMessage);
+                os.write(("ERROR " + errorMessage + "\r\n").getBytes());
+                logRequestAndResponse(request,404,errorMessage);
+                return;
+            }
 
             File outFile = new File(uploadDir, fileName);
+            System.out.println("Created output file: " + outFile.getAbsolutePath());
 
-            try (BufferedOutputStream fileOut = new BufferedOutputStream(new FileOutputStream(outFile))) {
-
-                byte[] buffer = new byte[65536];
-
+            try (FileOutputStream fileOut = new FileOutputStream(outFile)) {
+                byte[] buffer = new byte[1024];
                 int bytesRead;
+                long totalBytesRead = 0;
 
-                long totalBytesReceived = 0;
+                System.out.println("Starting file upload loop");
 
-                while (totalBytesReceived < fileSize && (bytesRead = is.read(buffer)) != -1) {
+                // Read data in chunks
+                while (totalBytesRead < fileSize && (bytesRead = is.read(buffer, 0,
+                        (int) Math.min(buffer.length, fileSize - totalBytesRead))) != -1) {
 
                     fileOut.write(buffer, 0, bytesRead);
+                    totalBytesRead += bytesRead;
 
-                    totalBytesReceived += bytesRead;
+                    System.out.println("Bytes Read: " + bytesRead);
+                    System.out.println("Total Bytes Received: " + totalBytesRead);
+                    System.out.println("File Size: " + fileSize);
                 }
 
-                if (totalBytesReceived == fileSize) {
-
+                if (totalBytesRead == fileSize) {
                     String successMessage = "File " + fileName + " uploaded successfully.";
-
                     System.out.println(successMessage);
-
-                    os.write(("SUCCESS " + successMessage + "\n").getBytes());
-
+                    os.write(("SUCCESS " + successMessage + "\r\n").getBytes());
+                    logRequestAndResponse(request,200,successMessage);
                 } else {
                     String errorMessage = "File upload incomplete for: " + fileName;
-
                     System.err.println(errorMessage);
-
-                    os.write(("ERROR " + errorMessage + "\n").getBytes());
+                    os.write(("ERROR " + errorMessage + "\r\n").getBytes());
+                    logRequestAndResponse(request,400,errorMessage);
                 }
             } catch (IOException e) {
-
                 String errorMessage = "Error writing file: " + e.getMessage();
-
                 System.err.println(errorMessage);
-
-                try {
-                    os.write(("ERROR " + errorMessage + "\n").getBytes());
-                } catch (IOException ex) {
-                    System.err.println("Error sending response: " + ex.getMessage());
-                }
-
+                os.write(("ERROR " + errorMessage + "\r\n").getBytes());
+                logRequestAndResponse(request,400,errorMessage);
             }
-        } catch (NumberFormatException | IOException e) {
 
+        } catch (NumberFormatException | IOException e) {
             String errorMessage = "Error handling file upload: " + e.getMessage();
             System.err.println(errorMessage);
-
+            logRequestAndResponse(request,400,errorMessage);
             try {
-                os.write(("ERROR " + errorMessage + "\n").getBytes());
+                os.write(("ERROR " + errorMessage + "\r\n").getBytes());
             } catch (IOException ex) {
                 System.err.println("Error sending response: " + ex.getMessage());
             }
-
         }
     }
 
 
     private boolean isValidFileType(String fileName) {
+
         String[] validExtensions = {".txt", ".jpg", ".png", ".mp4"};
+
         for (String ext : validExtensions) {
             if (fileName.toLowerCase().endsWith(ext)) {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -298,12 +333,8 @@ class RequestHandler extends Thread {
 
         String input;
 
-        try {
-            input = readRequest();
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        input = readLineFromInputStream();
 
         System.out.println("input: " + input);
 
@@ -353,7 +384,7 @@ class RequestHandler extends Thread {
                 }
             } else if (parts[0].equals("UPLOAD")) {
 
-//                System.out.println("received upload request");
+                System.out.println("received upload request");
 
                 try {
                     handleFileUpload(input,s.getInputStream(),s.getOutputStream());
@@ -362,18 +393,14 @@ class RequestHandler extends Thread {
                 }
 
 
-            } else {
-                try {
-                    sendResponse("<html><h2>501 Not Implemented</h2></html>", "501 Not Implemented", "text/html"); // Send a 501 response
-                    logRequestAndResponse(input, 501, "text/html"); // Log the 501 response
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
             }
         }
 
         try {
             s.close();
+
+            System.out.println("socket closed");
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -381,27 +408,27 @@ class RequestHandler extends Thread {
 
 }
 
-    public class HTTPServerSkeleton {
+public class HTTPServerSkeleton {
     static final int PORT = 6789;
 
-        public static byte[] readFileData(File file, int fileLength) throws IOException {
+    public static byte[] readFileData(File file, int fileLength) throws IOException {
 
-            FileInputStream fileIn = null;
-            byte[] fileData = new byte[fileLength];
+        FileInputStream fileIn = null;
+        byte[] fileData = new byte[fileLength];
 
-            try {
-                fileIn = new FileInputStream(file);
-                fileIn.read(fileData);
-            } finally {
-                if (fileIn != null)
-                    fileIn.close();
-            }
-
-            return fileData;
+        try {
+            fileIn = new FileInputStream(file);
+            fileIn.read(fileData);
+        } finally {
+            if (fileIn != null)
+                fileIn.close();
         }
 
+        return fileData;
+    }
 
-        public static void main(String[] args) throws IOException {
+
+    public static void main(String[] args) throws IOException {
 
         ServerSocket serverConnect = new ServerSocket(PORT);
         System.out.println("Server started.\nListening for connections on port : " + PORT + " ...\n");

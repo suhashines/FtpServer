@@ -1,0 +1,76 @@
+REQUEST: UPLOAD file1.txt 10
+RESPONSE: HTTP/1.1 200 200
+Message File file1.txt uploaded successfully.
+----------------------------------------------------
+REQUEST: UPLOAD image.jpg 118043
+RESPONSE: HTTP/1.1 200
+Message File image.jpg uploaded successfully.
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: UPLOAD file2.txt 9
+RESPONSE: HTTP/1.1 200
+MESSAGE: File file2.txt uploaded successfully.
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /file1.txt HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /testing/ HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/ HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/010-a.png HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: image/png
+----------------------------------------------------
+REQUEST: GET /dir1/010-a.png HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: image/png
+----------------------------------------------------
+REQUEST: GET /dir1/010-a.png HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: image/png
+----------------------------------------------------
+REQUEST: GET /dir1/010-a.png HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: image/png
+----------------------------------------------------
+REQUEST: GET / HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/ HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/dir2/ HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: text/html
+----------------------------------------------------
+REQUEST: GET /dir1/dir2/image.jpg HTTP/1.1
+RESPONSE: HTTP/1.1 200 OK
+Content-Type: image/jpeg
+----------------------------------------------------
+REQUEST: UPLOAD file1.txt 10
+RESPONSE: HTTP/1.1 200
+MESSAGE: File file1.txt uploaded successfully.
+----------------------------------------------------
+REQUEST: UPLOAD image.jpg 118043
+RESPONSE: HTTP/1.1 200
+MESSAGE: File image.jpg uploaded successfully.
+----------------------------------------------------
+REQUEST: UPLOAD file2.txt 9
+RESPONSE: HTTP/1.1 200
+MESSAGE: File file2.txt uploaded successfully.
+----------------------------------------------------

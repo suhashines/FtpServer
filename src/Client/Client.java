@@ -7,7 +7,7 @@ class FileUploadTask extends Thread {
     private final String fileName;
     private final String serverHost;
     private final int serverPort;
-    private static final int CHUNK_SIZE = 1024;  // File chunk size
+    private static final int CHUNK_SIZE = 1024;
 
     private static final String root = "src/Client/root/" ;
 
@@ -17,16 +17,39 @@ class FileUploadTask extends Thread {
         this.serverPort = serverPort;
     }
 
+    public String readLineFromInputStream(Socket s){
+        try {
+            InputStream inputStream = s.getInputStream();
+            int tmp;
+            StringBuilder response = new StringBuilder();
+            while((tmp = inputStream.read()) != -1){
+                char c = (char) tmp;
+                if(c == '\n') break;
+                response.append(c);
+            }
+            if(response.charAt(response.length() - 1) == '\r'){
+                response.deleteCharAt(response.length() - 1);
+            }
+            return response.toString();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void run() {
+
         File file = new File(fileName);
 
-        // Validate file extension (only text, image, mp4 allowed)
+        // valid file extension  (text, image, mp4 )
+
         if (!isValidFileType(file)) {
+
             System.err.println("Invalid file format: " + fileName.replace(root, ""));
+
             return;
         }
 
-        // Check if file exists
+
         if (!file.exists() || !file.isFile()) {
             System.err.println("File not found: " + fileName);
             return;
@@ -34,15 +57,16 @@ class FileUploadTask extends Thread {
 
         // Upload file in chunks
         try (Socket socket = new Socket(serverHost, serverPort);
-             BufferedOutputStream out = new BufferedOutputStream(socket.getOutputStream());
-             BufferedInputStream fileIn = new BufferedInputStream(new FileInputStream(file));
-             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+             OutputStream out = socket.getOutputStream();
+             FileInputStream fileIn = new FileInputStream(file)) {
 
-            // Send file upload header (filename and size)
-            PrintWriter writer = new PrintWriter(out, true);
-            writer.println("UPLOAD " + file.getName() + " " + file.length());
+            // Upload request header
 
-            // Send the file content in chunks
+            String requestHeader = "UPLOAD " + file.getName() + " " + file.length() + "\r\n";
+            out.write(requestHeader.getBytes());
+            out.flush();
+
+            // Sending file content in chunks
             byte[] buffer = new byte[CHUNK_SIZE];
             int bytesRead;
 
@@ -51,27 +75,31 @@ class FileUploadTask extends Thread {
                 out.flush();
             }
 
-            // Read the server's response
-            String responseLine;
-            while ((responseLine = reader.readLine()) != null) {
-                System.out.println("Server response: " + responseLine);
-                // If the server sends a blank line, stop reading
-                if (responseLine.isEmpty()) {
-                    break;
-                }
-            }
+//            System.out.println("sent to the server, waiting for response");
+
+//            out.close();
+
+            // Receive server's response
+           String response = readLineFromInputStream(socket);
+
+            System.out.println("server response: "+response);
 
         } catch (IOException e) {
-            System.err.println("Error uploading file: " + fileName + ". " + e.getMessage());
+            System.err.println("Error uploading file: " + file.getName() + ". " + e.getMessage());
         }
+
     }
 
 
-    // Method to validate allowed file types
+
     private boolean isValidFileType(File file) {
+
         String[] validExtensions = {".txt", ".jpg", ".png", ".mp4"};
+
         String fileName = file.getName().toLowerCase();
+
         for (String ext : validExtensions) {
+
             if (fileName.endsWith(ext)) {
                 return true;
             }
@@ -81,22 +109,25 @@ class FileUploadTask extends Thread {
 }
 
 public class Client {
-    private static final String SERVER_HOST = "localhost";  // Change this to your server's address if necessary
+    private static final String SERVER_HOST = "localhost";
     private static final int SERVER_PORT = 6789;
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
-            System.out.print("Enter the file name to upload (or type 'exit' to quit): ");
+
+            System.out.print("Enter the file name to upload (or type 'q' to quit): ");
+
             String fileName = scanner.nextLine();
 
-            if (fileName.equalsIgnoreCase("exit")) {
+            if (fileName.equalsIgnoreCase("q")) {
                 break;
             }
 
-            // Start a new thread to upload the file
+            // file upload thread
             FileUploadTask uploadTask = new FileUploadTask(fileName, SERVER_HOST, SERVER_PORT);
+
             uploadTask.start();
         }
 
